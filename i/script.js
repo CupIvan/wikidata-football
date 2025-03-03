@@ -1,10 +1,27 @@
-function start(fname, year)
+let g_Q
+
+navigation.addEventListener('navigate', _=>setTimeout(start, 100))
+
+function start(Q)
 {
-	fetch(fname+'/'+year+'.json').then(_=>_.text()).then(st=>{
-		st = st.replace(/\n/g, ' ') // в одну строку
-		st = st.replace(/([a-z][a-z0-9]+):/ig, '"$1":') // двойные кавычки
-		st = st.replace(/,\s+([}\]])/g, '$1') // последняя запятая
-		const data = JSON.parse(st)
+	document.body.innerHTML = ''; if (!Q) Q = g_Q; else g_Q = Q
+
+	let re, year
+	if (re = /year=(\d{4})/.exec(document.location.hash)) { year = re[1] }
+
+	if (year)
+	{
+		drawYears(Q, year, true).then(a=>{
+			drawStatistic('../../db/'+Q+'/'+a.fname)
+		})
+	} else
+		drawTournaments(Q)
+}
+
+function drawStatistic(fname)
+{
+	fetch(fname).then(_=>_.text()).then(st=>{
+		const data = toJSON(st)
 
 		data.name = data.entity[data.wikidata].name
 
@@ -54,7 +71,7 @@ function start(fname, year)
 function drawTitle(a)
 {
 	let y1 = a.dateStart, y2 = a.dateEnd
-	let st = '<h1>'+a.name+' '+y1+'/'+y2+_wd(a.wikidata)+'</h1>'
+	let st = '<h1><a href="'+a.wikipedia+'">'+a.name+' '+y1+'/'+y2+'</a>'+_wd(a.wikidata)+'</h1>'
 	const div = document.createElement('div'); div.innerHTML = st
 	document.body.appendChild(div)
 }
@@ -116,7 +133,7 @@ function drawResults(a, entity)
 			+'<td>'+a[i].fails
 			+'<td>'+a[i].goals
 			+'<td>'+a[i].skips
-			+'<td class="r">'+(a[i].GD>0?'+':'')+a[i].GD
+			+'<td class="r">'+(a[i].GD>0?'&plus;':'&minus;')+Math.abs(a[i].GD)
 			+'<td class="b">'+a[i].PTS
 	}
 	st += '</table>'
@@ -145,6 +162,44 @@ function drawQuickStatements(a, Q)
 	document.body.appendChild(el)
 }
 
+async function drawYears(Q, year)
+{
+	return fetch('../../db/'+Q+'/index.json').then(_=>_.text()).then(st=>{
+		let res = {}
+		const data = toJSON(st)
+		st = '<a href="#">/</a>'
+		for (let i=0; i<data.length; i++)
+		{
+			let cl = ''
+			if (data[i].year == year) { cl = 'class="active"'; res = data[i] }
+			st += '<a href="#?year='+data[i].year+'"'+cl+'>'+data[i].year+'</a>'
+		}
+		draw(st, 'nav')
+		return res
+	})
+}
+
+function drawTournaments(Q)
+{
+	fetch('../../db/'+Q+'/index.json').then(_=>_.text()).then(st=>{
+		const data = toJSON(st)
+		st = ''
+		for (let i=0; i<data.length; i++)
+			st += '<li><a href="#?year='+data[i].year+'">'+data[i].name+'</a>'
+		draw(st, 'ul')
+	})
+}
+
+function draw(st, tag = 'div', is_in_head = false)
+{
+	const el = document.createElement(tag); el.innerHTML = st
+	if (is_in_head)
+		document.body.insertBefore(el, document.body.firstChild)
+	else
+		document.body.appendChild(el)
+	return el
+}
+
 
 function _team(teams, team)
 {
@@ -166,4 +221,13 @@ function _prepare_qs(e)
 function _wd(Q)
 {
 	return '<sup><a href="https://www.wikidata.org/wiki/'+Q+'" target="_blank">[wd]</a></sup>';
+}
+
+function toJSON(st)
+{
+	st = st.replace(/'/g, '"') // вместо одинарных кавычек двойные
+	st = st.replace(/\n/g, ' ') // в одну строку
+	st = st.replace(/([a-z][a-z0-9]+):/ig, '"$1":') // названия параметров двойные кавычки
+	st = st.replace(/,\s+([}\]])/g, '$1') // последняя запятая
+	return JSON.parse(st)
 }

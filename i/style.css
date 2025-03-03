@@ -22,3 +22,8 @@ form { display: inline-block; float: left; clear: left; margin: 40px 0; padding-
 form textarea { width: 800px; height: 200px; font-size: 10px; }
 
 sup a { text-decoration: none; font-size: 80%; }
+
+nav          { margin-bottom: 10px; }
+nav>a        { border: 1px solid #999; display: inline-block; padding: 5px 10px; text-decoration: none; color: #999; margin-right: 5px; }
+nav>a:hover  { border: 1px solid #00F; }
+nav>a.active { border: 1px solid #00F; color: #00F; }
