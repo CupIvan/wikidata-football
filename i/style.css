@@ -1,0 +1,24 @@
+table { border: 2px solid #999; border-collapse: collapse; margin-bottom: 10px; margin-right: 10px; }
+table td,
+table th { border: 1px solid #999; padding: 5px 10px; }
+table th { background: #EEE; }
+table tr:nth-child(odd) { background: #FAFAFA; }
+table tr:hover td { background: #F0F0F0; }
+table tr.active { background: #CCC; }
+
+.c { text-align: center; }
+.r { text-align: right; }
+.l { text-align: left; }
+.b { font-weight: bold; }
+
+.sm { font-size: 80%; }
+
+.yellow { background: #ffffbb; }
+.red    { background: #ffbbbb; }
+.green  { background: #bbf3bb; }
+
+section { float: left; }
+form { display: inline-block; float: left; clear: left; margin: 40px 0; padding-top: 40px; border-top: 2px solid #999; }
+form textarea { width: 800px; height: 200px; font-size: 10px; }
+
+sup a { text-decoration: none; font-size: 80%; }
