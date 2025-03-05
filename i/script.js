@@ -182,6 +182,7 @@ async function drawYears(Q, year)
 function drawTournaments(Q)
 {
 	fetch('../../db/'+Q+'/index.json').then(_=>_.text()).then(st=>{
+		draw('<a href="../../">Все чемпионаты</a>', 'div')
 		const data = toJSON(st)
 		st = ''
 		for (let i=0; i<data.length; i++)
